@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5ffeed7458c3a8f0dfa015c88d0337c7",
+    "content-hash": "5e730181dfacac4faf83cd215c14eb9c",
     "packages": [],
     "packages-dev": [
         {
@@ -1433,12 +1433,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "6ce7c0b02073ed9662bffe1b055d2f7d824e2640"
+                "reference": "cf5af610ccf32de46be730453df51056166bdf0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/6ce7c0b02073ed9662bffe1b055d2f7d824e2640",
-                "reference": "6ce7c0b02073ed9662bffe1b055d2f7d824e2640",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/cf5af610ccf32de46be730453df51056166bdf0c",
+                "reference": "cf5af610ccf32de46be730453df51056166bdf0c",
                 "shasum": ""
             },
             "require": {
@@ -1527,7 +1527,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-09-22T11:53:57+00:00"
+            "time": "2023-09-24T14:32:42+00:00"
         },
         {
             "name": "psr/container",
@@ -2214,12 +2214,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/exporter.git",
-                "reference": "326ce39e7aba308b2905b3ade1c6f811b2964a09"
+                "reference": "64f51654862e0f5e318db7e9dcc2292c63cdbddc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/326ce39e7aba308b2905b3ade1c6f811b2964a09",
-                "reference": "326ce39e7aba308b2905b3ade1c6f811b2964a09",
+                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/64f51654862e0f5e318db7e9dcc2292c63cdbddc",
+                "reference": "64f51654862e0f5e318db7e9dcc2292c63cdbddc",
                 "shasum": ""
             },
             "require": {
@@ -2277,7 +2277,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/exporter/issues",
                 "security": "https://github.com/sebastianbergmann/exporter/security/policy",
-                "source": "https://github.com/sebastianbergmann/exporter/tree/main"
+                "source": "https://github.com/sebastianbergmann/exporter/tree/5.1.1"
             },
             "funding": [
                 {
@@ -2285,7 +2285,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-09-18T07:16:40+00:00"
+            "time": "2023-09-24T13:22:09+00:00"
         },
         {
             "name": "sebastian/global-state",
@@ -3865,7 +3865,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.2.5"
+        "php": ">=8.1"
     },
     "platform-dev": [],
     "plugin-api-version": "2.3.0"

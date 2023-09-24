@@ -2,21 +2,21 @@
 
 namespace Phariscope\Event\Tests;
 
-use Phariscope\Event\EventInterface;
+use Phariscope\Event\EventAbstract;
 use Phariscope\Event\EventSubscriber;
 
 class BadSubscriber implements EventSubscriber
 {
-    public EventInterface $domainEvent;
+    public EventAbstract $domainEvent;
 
     public int $handleCallCount = 0;
 
-    public function handle(EventInterface $aDomainEvent): bool
+    public function handle(EventAbstract $aDomainEvent): bool
     {
         throw new \Exception("I am a bad subscriber");
     }
 
-    public function isSubscribedTo(EventInterface $aDomainEvent): bool
+    public function isSubscribedTo(EventAbstract $aDomainEvent): bool
     {
         return true;
     }

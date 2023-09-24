@@ -5,7 +5,7 @@ composer require phariscope/event
 # Usage
 
 Steps are:
-* create a domain event (name + past tense verb, example: AccountCreated implements EventInterface)
+* create a domain event (name + past tense verb, example: AccountCreated extends EventAbstract)
 * publish this event
 * distribute events
 

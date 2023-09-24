@@ -2,13 +2,13 @@
 
 namespace Phariscope\Event\Tests;
 
-use Phariscope\Event\EventInterface;
+use Phariscope\Event\EventAbstract;
 use Safe\DateTimeImmutable;
 
 /**
  * EventSended : nom + verbe au passé pour nommer vos evennements
  */
-class EventSent implements EventInterface
+class EventSent extends EventAbstract
 {
     private string $id;
     private DateTimeImmutable $occurredOn;

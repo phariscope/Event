@@ -8,7 +8,7 @@ final class EventPublisher
     private array $subscribers;
     private static ?EventPublisher $instance = null;
 
-    /** @var array<EventInterface> */
+    /** @var array<EventAbstract> */
     private array $eventToDistribute;
 
     private bool $distributeImmediatly = false;
@@ -48,7 +48,7 @@ final class EventPublisher
         return count($this->subscribers) - 1;
     }
 
-    public function publish(EventInterface $anEvent): void
+    public function publish(EventAbstract $anEvent): void
     {
         $this->eventToDistribute[] =  $anEvent;
         if ($this->distributeImmediatly) {
@@ -64,21 +64,21 @@ final class EventPublisher
         }
     }
 
-    private function distributeEventToSubscribers(EventInterface $event): void
+    private function distributeEventToSubscribers(EventAbstract $event): void
     {
         foreach ($this->subscribers as $aSubscriber) {
             $this->tryToHandleEventIfSubscribed($aSubscriber, $event);
         }
     }
 
-    private function tryToHandleEventIfSubscribed(EventSubscriber $subscriber, EventInterface $event): void
+    private function tryToHandleEventIfSubscribed(EventSubscriber $subscriber, EventAbstract $event): void
     {
         if ($subscriber->isSubscribedTo($event)) {
             $this->tryToHandleEvent($subscriber, $event);
         }
     }
 
-    private function tryToHandleEvent(EventSubscriber $subscriber, EventInterface $event): void
+    private function tryToHandleEvent(EventSubscriber $subscriber, EventAbstract $event): void
     {
         try {
             $subscriber->handle($event);
