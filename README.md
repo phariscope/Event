@@ -1,13 +1,15 @@
 # Installation
 
+```console
 composer require phariscope/event
+```
 
 # Usage
 
 Steps are:
-* create a domain event (name + past tense verb, example: AccountCreated extends EventAbstract)
-* publish this event
-* distribute events
+* Create a domain event (name + past tense verb, example: `AccountCreated` extends `EventAbstract`).
+* Publish this event.
+* Distribute events.
 
 Somewhere else:
 * create a subscriber at an event (exemple: class SendEmailWhenAccountCreatedSubscriber implements EventSubscriber)
@@ -30,11 +32,11 @@ Somewhere else:
 bin/phpunit
 ```
 
-with Test Developpment Driven (thanks Kent Beck and the others), good practices (thanks R.Martin and the others)
+Using Test-Driven Development (TDD) principles (thanks to Kent Beck and others), following good practices (thanks to Uncle Bob and others) and the great book 'DDD in PHP' by C. Buenosvinos, C. Soronellas, K. Akbary
 
 ## Quality
 
-* phpcs STR12
+* phpcs PSR12
 * phpstan level 9
 * coverage 100%
 * infection MSI >99%
