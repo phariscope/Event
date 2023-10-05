@@ -38,14 +38,12 @@ final class EventPublisher
         throw new \BadMethodCallException('Clone is not supported');
     }
 
-    /**
-     * @return int index du subscriber
-     */
     public function subscribe(
-        EventSubscriber $aDomainEventSubscriber
-    ): int {
-        $this->subscribers[] = $aDomainEventSubscriber;
-        return count($this->subscribers) - 1;
+        EventSubscriber $eventSubscriber
+    ): void {
+        if (!$this->hasSubscriber($eventSubscriber)) {
+            $this->subscribers[] = $eventSubscriber;
+        }
     }
 
     public function publish(EventAbstract $anEvent): void
@@ -91,16 +89,22 @@ final class EventPublisher
         unset($this->eventToDistribute[$index]);
     }
 
-    /**
-     * @param int $id index du subscriber
-     */
-    public function unsubscribe(int $id): void
+    public function unsubscribe(EventSubscriber $subscriber): void
     {
-        unset($this->subscribers[$id]);
+        foreach ($this->subscribers as $id => $aSubscriber) {
+            if ($aSubscriber === $subscriber) {
+                unset($this->subscribers[$id]);
+            }
+        }
     }
 
     public static function tearDown(): void
     {
         static::$instance = null;
+    }
+
+    public function hasSubscriber(EventSubscriber $subscriber): bool
+    {
+        return false !== array_search($subscriber, $this->subscribers, true);
     }
 }

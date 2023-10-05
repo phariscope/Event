@@ -12,15 +12,15 @@ class EventPublisherTest extends TestCase
         EventPublisher::tearDown();
     }
 
-    public function testSubscribe(): void
+    public function testHasSubscribed(): void
     {
         $subscriber = new SpySubscriber();
 
-        $id = EventPublisher::instance()->subscribe($subscriber);
-        $this->assertSame(0, $id);
+        EventPublisher::instance()->subscribe($subscriber);
+        $this->assertTrue(EventPublisher::instance()->hasSubscriber($subscriber));
 
-        $id = EventPublisher::instance()->subscribe($subscriber);
-        $this->assertSame(1, $id);
+        EventPublisher::instance()->subscribe($subscriber);
+        $this->assertTrue(EventPublisher::instance()->hasSubscriber($subscriber));
     }
 
     public function testPublishWithDistributeImmediatly(): void
@@ -28,7 +28,7 @@ class EventPublisherTest extends TestCase
         EventPublisher::instance()->distributeImmmediatly();
 
         $subscriber = new SpySubscriber();
-        $id = EventPublisher::instance()->subscribe($subscriber);
+        EventPublisher::instance()->subscribe($subscriber);
 
         $event = new EventSent("unId");
         EventPublisher::instance()->publish($event);
@@ -42,8 +42,8 @@ class EventPublisherTest extends TestCase
     public function testUnsubscribe(): void
     {
         $subscriber = new SpySubscriber();
-        $id = EventPublisher::instance()->subscribe($subscriber);
-        EventPublisher::instance()->unsubscribe($id);
+        EventPublisher::instance()->subscribe($subscriber);
+        EventPublisher::instance()->unsubscribe($subscriber);
         $event = new EventSent("unId");
         EventPublisher::instance()->publish($event);
         $this->assertFalse(isset($subscriber->domainEvent));
@@ -60,16 +60,17 @@ class EventPublisherTest extends TestCase
     {
         $subscriber = new SpySubscriber();
 
-        $id = EventPublisher::instance()->subscribe($subscriber);
+        EventPublisher::instance()->subscribe($subscriber);
 
-        $this->assertSame(0, $id);
+        $this->assertTrue(EventPublisher::instance()->hasSubscriber($subscriber));
 
         EventPublisher::tearDown();
 
         $subscriber = new SpySubscriber();
 
-        $id = EventPublisher::instance()->subscribe($subscriber);
-        $this->assertSame(0, $id);
+        EventPublisher::instance()->subscribe($subscriber);
+
+        $this->assertTrue(EventPublisher::instance()->hasSubscriber($subscriber));
     }
 
     public function testDistributeOneEvent(): void
@@ -77,7 +78,7 @@ class EventPublisherTest extends TestCase
         $event = new EventSent("unId");
 
         $eventSubscriber = new SpySubscriber();
-        $id = EventPublisher::instance()->subscribe($eventSubscriber);
+        EventPublisher::instance()->subscribe($eventSubscriber);
 
         EventPublisher::instance()->publish($event);
 
@@ -95,7 +96,7 @@ class EventPublisherTest extends TestCase
         $event3 = new EventSent("id3");
 
         $eventSubscriber = new SpySubscriber();
-        $id = EventPublisher::instance()->subscribe($eventSubscriber);
+        EventPublisher::instance()->subscribe($eventSubscriber);
 
         EventPublisher::instance()->publish($event1);
         EventPublisher::instance()->publish($event2);
@@ -117,7 +118,7 @@ class EventPublisherTest extends TestCase
         $event = new EventSent("unId");
 
         $eventSubscriber = new SpySubscriber();
-        $id = EventPublisher::instance()->subscribe($eventSubscriber);
+        EventPublisher::instance()->subscribe($eventSubscriber);
 
         EventPublisher::instance()->distributeImmmediatly();
 
@@ -145,5 +146,19 @@ class EventPublisherTest extends TestCase
         EventPublisher::instance()->distribute();
 
         $this->assertEquals(2, $eventSubscriber->handleCallCount);
+    }
+
+    public function testSubscribeUnsubscribe(): void
+    {
+        $subscriber = new SpySubscriber();
+        $publisher = EventPublisher::instance();
+        $publisher->subscribe($subscriber);
+        $publisher->subscribe($subscriber);
+
+        $this->assertTrue($publisher->hasSubscriber($subscriber));
+
+        $publisher->unsubscribe($subscriber);
+
+        $this->assertFalse($publisher->hasSubscriber($subscriber));
     }
 }
