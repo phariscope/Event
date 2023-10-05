@@ -46,6 +46,11 @@ final class EventPublisher
         }
     }
 
+    public function hasSubscriber(EventSubscriber $subscriber): bool
+    {
+        return false !== array_search($subscriber, $this->subscribers, true);
+    }
+
     public function publish(EventAbstract $anEvent): void
     {
         $this->eventToDistribute[] =  $anEvent;
@@ -101,10 +106,5 @@ final class EventPublisher
     public static function tearDown(): void
     {
         static::$instance = null;
-    }
-
-    public function hasSubscriber(EventSubscriber $subscriber): bool
-    {
-        return false !== array_search($subscriber, $this->subscribers, true);
     }
 }
