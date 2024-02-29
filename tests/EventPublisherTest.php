@@ -3,6 +3,7 @@
 namespace Phariscope\Event\Tests;
 
 use Phariscope\Event\EventPublisher;
+use Phariscope\Event\Tools\SpySubscriber;
 use PHPUnit\Framework\TestCase;
 
 class EventPublisherTest extends TestCase

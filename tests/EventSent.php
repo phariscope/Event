@@ -2,12 +2,12 @@
 
 namespace Phariscope\Event\Tests;
 
-use Phariscope\Event\EventAbstract;
+use Phariscope\Event\Psr14\Event;
 
 /**
  * EventSent : name + past tensed verb
  */
-class EventSent extends EventAbstract
+class EventSent extends Event
 {
     private string $id;
 

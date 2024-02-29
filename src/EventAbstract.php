@@ -2,14 +2,12 @@
 
 namespace Phariscope\Event;
 
-abstract class EventAbstract implements EventInterface
-{
-    public function __construct(protected \DateTimeImmutable $occurredOn = new \DateTimeImmutable())
-    {
-    }
+use Phariscope\Event\Psr14\Event;
 
-    public function occurredOn(): \DateTimeImmutable
-    {
-        return $this->occurredOn;
-    }
+/**
+ * @deprecated Use Event instead.
+ * @package Phariscope\Event
+ */
+abstract class EventAbstract extends Event
+{
 }

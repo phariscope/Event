@@ -9,6 +9,6 @@ docker run ${moinsit} --rm \
   --volume $PWD:/app \
   --user 1000:1000 \
   -ti \
-  --name composer-running-script \
+  --name composer-running-script-event \
   -v "$PWD":/usr/src \
   composer:2.5.5 composer $@
