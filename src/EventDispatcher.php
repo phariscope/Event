@@ -16,6 +16,26 @@ class EventDispatcher implements EventDispatcherInterface
 
     protected bool $distributeImmediatly = false;
 
+    protected static ?EventDispatcher $instance = null;
+
+    private function __construct()
+    {
+        $this->subscribers = [];
+        $this->eventToDistribute = [];
+    }
+
+    public static function instance(): EventDispatcher
+    {
+        if (null === static::$instance) {
+            static::$instance = new EventDispatcher();
+        };
+        return static::$instance;
+    }
+
+    public static function tearDown(): void
+    {
+        static::$instance = null;
+    }
     public function distributeImmmediatly(): void
     {
         $this->distributeImmediatly = true;
@@ -55,7 +75,7 @@ class EventDispatcher implements EventDispatcherInterface
 
     public function dispatch(Event $event): Event
     {
-        $this->eventToDistribute[] =  $event;
+        array_push($this->eventToDistribute, $event);
         if ($this->distributeImmediatly) {
             $this->distribute();
         }
@@ -65,9 +85,11 @@ class EventDispatcher implements EventDispatcherInterface
 
     public function distribute(): void
     {
-        foreach ($this->eventToDistribute as $index => $event) {
+        if (count($this->eventToDistribute) == 0) {
+            return;
+        }
+        while ($event = array_shift($this->eventToDistribute)) {
             $this->distributeEventToSubscribers($event);
-            $this->unsetEventByIndex($index);
         }
     }
 
@@ -91,11 +113,6 @@ class EventDispatcher implements EventDispatcherInterface
             $subscriber->handle($event);
         } catch (\Exception $e) {
         }
-    }
-
-    private function unsetEventByIndex(int $index): void
-    {
-        unset($this->eventToDistribute[$index]);
     }
 
     public function unsubscribe(ListenerInterface $subscriber): void
