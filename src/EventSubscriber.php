@@ -2,12 +2,9 @@
 
 namespace Phariscope\Event;
 
-interface EventSubscriber
-{
-    /**
-     * @return bool handled event. true si l'evenement a été traité.
-     */
-    public function handle(EventAbstract $aDomainEvent): bool;
+use Phariscope\Event\Psr14\ListenerInterface;
 
-    public function isSubscribedTo(EventAbstract $aDomainEvent): bool;
+/** @deprecated use ListenerInterface */
+interface EventSubscriber extends ListenerInterface
+{
 }

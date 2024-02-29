@@ -1,6 +1,6 @@
 <?php
 
-namespace Phariscope\Event;
+namespace Phariscope\Event\Psr14;
 
 interface EventInterface
 {

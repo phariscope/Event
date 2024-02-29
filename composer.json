@@ -2,7 +2,7 @@
     "name": "phariscope/event",
     "type": "library",
     "description": "To implement events in domain driven developement or anyother styles projects with PHP",
-    "keywords": ["templating"],
+    "keywords": ["event"],
     "homepage": "https://github.com/phariscope/Event",
     "license": "MIT",
     "minimum-stability": "dev",
