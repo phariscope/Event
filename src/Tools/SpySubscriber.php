@@ -2,31 +2,10 @@
 
 namespace Phariscope\Event\Tools;
 
-use Phariscope\Event\Psr14\Event;
-use Phariscope\Event\Psr14\ListenerInterface;
-
 /**
+ * @deprecated use SpyListener
  * a spy subscriber for testing purpose
  */
-class SpySubscriber implements ListenerInterface
+class SpySubscriber extends SpyListener
 {
-    public Event $domainEvent;
-
-    public int $handleCallCount = 0;
-
-    /** @var array<Event> */
-    public array $traces;
-
-    public function handle(Event $aDomainEvent): bool
-    {
-        $this->domainEvent = $aDomainEvent;
-        $this->handleCallCount++;
-        $this->traces[] = $aDomainEvent;
-        return true;
-    }
-
-    public function isSubscribedTo(Event $aDomainEvent): bool
-    {
-        return true;
-    }
 }

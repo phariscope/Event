@@ -3,6 +3,7 @@
 namespace Phariscope\Event\Tests;
 
 use Phariscope\Event\EventPublisher;
+use Phariscope\Event\Tools\SpyListener;
 use Phariscope\Event\Tools\SpySubscriber;
 use PHPUnit\Framework\TestCase;
 
@@ -96,7 +97,7 @@ class EventPublisherTest extends TestCase
         $event2 = new EventSent("id2");
         $event3 = new EventSent("id3");
 
-        $eventSubscriber = new SpySubscriber();
+        $eventSubscriber = new SpyListener();
         EventPublisher::instance()->subscribe($eventSubscriber);
 
         EventPublisher::instance()->publish($event1);
