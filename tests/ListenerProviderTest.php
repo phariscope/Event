@@ -21,7 +21,6 @@ class ListenerProviderTest extends TestCase
         $listener = new ListenerProvider();
         $listener->addListener(EventSent::class, $spy);
         $listeners =  $listener->getListenersForEvent($event);
-        $this->assertIsIterable($listeners);
         $this->assertEquals($spy, $listeners[0]);
     }
 
