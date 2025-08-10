@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phariscope\Event\Tests;
 
 use Phariscope\Event\Psr14\Event;
@@ -11,12 +13,12 @@ class BadSubscriber implements ListenerInterface
 
     public int $handleCallCount = 0;
 
-    public function handle(Event $aDomainEvent): bool
+    public function handle(Event $event): bool
     {
         throw new \Exception("I am a bad subscriber");
     }
 
-    public function isSubscribedTo(Event $aDomainEvent): bool
+    public function isSubscribedTo(Event $event): bool
     {
         return true;
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phariscope\Event\Psr14;
 
 use Phariscope\Event\Psr14\Event;
@@ -16,7 +18,7 @@ interface EventDispatcherInterface
      *   The object to process.
      *
      * @return Event
-     *   The Event that was passed, now modified by listeners.
+     *   The Event that was passed. In this library, listeners MUST NOT mutate the event instance.
      */
     public function dispatch(Event $event): Event;
 }

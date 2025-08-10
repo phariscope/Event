@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phariscope\Event\Tests\SomeListeners;
 
 use Phariscope\Event\EventDispatcher;
@@ -9,16 +11,16 @@ use Phariscope\Event\Tools\SpyListener;
 
 class LoopListener extends SpyListener
 {
-    public function handle(Event $aDomainEvent): bool
+    public function handle(Event $event): bool
     {
-        parent::handle($aDomainEvent);
+        parent::handle($event);
         $event = new EventSent("2");
 
         EventDispatcher::instance()->dispatch($event);
         return true;
     }
 
-    public function isSubscribedTo(Event $aDomainEvent): bool
+    public function isSubscribedTo(Event $event): bool
     {
         return true;
     }

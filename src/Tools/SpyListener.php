@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phariscope\Event\Tools;
 
 use Phariscope\Event\Psr14\Event;
@@ -14,18 +16,18 @@ class SpyListener implements ListenerInterface
 
     public int $handleCallCount = 0;
 
-    /** @var array<Event> */
+    /** @var array<int,Event> */
     public array $traces;
 
-    public function handle(Event $aDomainEvent): bool
+    public function handle(Event $event): bool
     {
-        $this->domainEvent = $aDomainEvent;
+        $this->domainEvent = $event;
         $this->handleCallCount++;
-        $this->traces[] = $aDomainEvent;
+        $this->traces[] = $event;
         return true;
     }
 
-    public function isSubscribedTo(Event $aDomainEvent): bool
+    public function isSubscribedTo(Event $event): bool
     {
         return true;
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phariscope\Event\Tests;
 
 use Phariscope\Event\Psr14\Event;
@@ -11,9 +13,9 @@ class EventSent extends Event
 {
     private string $id;
 
-    public function __construct(string $id, \DateTimeImmutable $occuredOn = new \DateTimeImmutable())
+    public function __construct(string $id, \DateTimeImmutable $occurredOn = new \DateTimeImmutable())
     {
-        parent::__construct($occuredOn);
+        parent::__construct($occurredOn);
         $this->id = $id;
     }
 

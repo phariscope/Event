@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phariscope\Event\Psr14;
 
 use Phariscope\Event\Psr14\Event;
@@ -12,7 +14,7 @@ interface ListenerProviderInterface
     /**
      * @param Event $event
      *   An event for which to return the relevant listeners.
-     * @return array<ListenerInterface>
+     * @return array<int,ListenerInterface>
      *   An iterable (array, iterator, or generator) of callables.  Each
      *   callable MUST be type-compatible with $event.
      */

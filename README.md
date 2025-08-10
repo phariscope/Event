@@ -7,15 +7,186 @@ composer require phariscope/event
 # Usage
 
 Steps are:
-* Create a domain event (name + past tense verb, example: `AccountCreated` extends `EventAbstract`).
-* Publish this event.
-* Distribute events.
+* Create a domain event (name + past tense verb, example: `AccountCreated` extends `Phariscope\\Event\\Psr14\\Event`).
+* Dispatch this event.
+* Distribute events (manually, or enable immediate distribution).
 
 Somewhere else:
-* create a subscriber at an event (exemple: class SendEmailWhenAccountCreatedSubscriber implements EventSubscriber)
-* register the subscriber, when event will be distrute the subscriber will handle it and do what it has to do
+* create a listener for an event (example: class `SendEmailWhenAccountCreatedListener` implements `Phariscope\\Event\\Psr14\\ListenerInterface`)
+* register the listener; when the event is distributed the listener will handle it and do what it has to do
 
-# To Contribut to pharsicope/Event
+## Sample usage in an aggregate constructor
+You SHOULD dispatch a domain event from an aggregate to signal its creation. This helps apply the Single Responsibility Principle: cross‑cutting concerns (emails, projections, integrations) live in listeners rather than inside the aggregate.
+
+```php
+<?php
+
+namespace App\\Domain\\Account;
+
+use Phariscope\\Event\\EventDispatcher;
+use Phariscope\\Event\\Psr14\\Event;
+use Phariscope\\Event\\Psr14\\ListenerInterface;
+
+// 1) The domain event
+final class AccountCreated extends Event
+{
+    public function __construct(
+        public string $accountId,
+        \DateTimeImmutable $occurredOn = new \DateTimeImmutable()
+    ) {
+        parent::__construct($occurredOn);
+    }
+}
+
+// 2) The aggregate that emits the event
+final class Account
+{
+    public function __construct(private string $id)
+    {
+        // ... domain invariants and state initialization ...
+
+        // At the end of construction, dispatch the domain event
+        EventDispatcher::instance()->dispatch(new AccountCreated($this->id));
+    }
+}
+
+// 3) A listener that reacts to the event
+final class SendWelcomeEmailListener implements ListenerInterface
+{
+    public function handle(Event $event): bool
+    {
+        if (!$event instanceof AccountCreated) {
+            return false;
+        }
+
+        // send email here
+        return true;
+    }
+
+    public function isSubscribedTo(Event $event): bool
+    {
+        return $event instanceof AccountCreated;
+    }
+}
+
+// 4) Wiring the listener and triggering the flow
+$dispatcher = EventDispatcher::instance();
+$dispatcher->subscribe(new SendWelcomeEmailListener());
+
+// Somewhere in your application flow
+new Account('acc-123');
+
+// Process the queued events (unless you enabled immediate distribution)
+$dispatcher->distribute();
+```
+
+## Immediate distribution
+
+By default, events dispatched via `EventDispatcher::dispatch()` are queued (FIFO) and processed when you call `EventDispatcher::distribute()`.
+
+If you want events to be processed immediately upon dispatch, enable immediate distribution:
+
+```php
+use Phariscope\Event\EventDispatcher;
+
+$dispatcher = EventDispatcher::instance();
+$dispatcher->distributeImmediately(); // enables automatic distribute() after each dispatch
+ 
+// You can disable it later if needed
+$dispatcher->disableImmediateDistribution();
+
+// And you can check the current mode
+if ($dispatcher->isImmediateDistributionEnabled()) {
+    // ...
+}
+```
+
+## Optional logging
+
+You can plug a PSR-3 logger to observe listener exceptions without breaking the dispatch flow:
+
+```php
+use Phariscope\Event\EventDispatcher;
+use Psr\Log\NullLogger; // or Monolog\Logger
+
+$dispatcher = EventDispatcher::instance();
+$dispatcher->setLogger(new NullLogger());
+```
+
+Deprecated: the misspelled method `distributeImmmediatly()` is still available for backward compatibility but will be removed in a future release. Use `distributeImmediately()` instead.
+
+### Resetting subscribers (useful in tests)
+
+When using the singleton in tests or long‑running processes, you may need to reset the subscriptions between scenarios:
+
+```php
+use Phariscope\Event\EventDispatcher;
+
+$dispatcher = EventDispatcher::instance();
+
+// Remove all currently subscribed listeners
+$dispatcher->clearSubscribers();
+
+// If you also need a fresh instance (clears queue and state)
+EventDispatcher::tearDown();
+$dispatcher = EventDispatcher::instance();
+```
+
+## PSR-14 compliance (internal integration)
+
+This package integrates PSR-14 semantics internally while preserving the legacy API:
+- You can still use `EventDispatcher` (singleton, queue, `distribute()` / `distributeImmediately()`).
+- Listeners remain `Phariscope\Event\Psr14\ListenerInterface`.
+- `StoppableEventInterface` is honored: if your event implements it and returns `true` in `isPropagationStopped()`, the dispatcher stops invoking further listeners after the current one.
+- Exceptions thrown by listeners are swallowed by the legacy dispatcher (as before). Use the optional PSR-3 logger to observe them.
+
+## Complete DDD/TDD Examples
+
+For comprehensive examples showing how to use this library in a Domain-Driven Design context with Test-Driven Development, see [DDD-TDD-EXAMPLES.md](DDD-TDD-EXAMPLES.md). This documentation covers:
+
+- **Domain Layer**: Aggregates, domain events, and event testing
+- **Application Layer**: Services with event distribution and testing  
+- **Infrastructure Layer**: Controllers, email listeners, and integration tests
+- **Complete workflow**: From HTTP request to domain event to email notification
+- **Key practices**: Event dispatching, testing with SpyListener, and distribution modes
+
+## Migration guide: Legacy API → PSR-14 (concepts)
+
+### Mapping
+
+- Legacy dispatcher: `Phariscope\Event\EventDispatcher` (queued) → PSR concept: synchronous, immediate dispatch
+- Legacy listener: `Phariscope\Event\Psr14\ListenerInterface` → PSR concept: `callable(object): void`
+- Legacy provider: `Phariscope\Event\ListenerProvider` (custom type) → PSR concept: provider returns callables for a given event object
+- Legacy event type: `Phariscope\Event\Psr14\Event` → PSR concept: any `object` (optionally implement `StoppableEventInterface`)
+- Immediate distribution: `distributeImmediately()` → PSR concept: always immediate by design
+
+### Steps
+
+1) Install PSR-14 interfaces (already a dependency of this package): `psr/event-dispatcher`.
+
+2) Instantiate the legacy dispatcher as usual (PSR semantics are handled internally at distribution time).
+
+3) Enregistrer vos listeners legacy via `EventDispatcher::subscribe()` comme auparavant.
+
+4) Remplacer les appels de distribution:
+```php
+// Avant (legacy)
+Phariscope\Event\EventDispatcher::instance()->dispatch($event);
+Phariscope\Event\EventDispatcher::instance()->distribute();
+
+// Après (sémantique PSR intégrée)
+$dispatcher->dispatch($event); // synchronously handled when immediate distribution is enabled
+```
+
+5) Propagation stoppable (facultatif): implémentez `Psr\EventDispatcher\StoppableEventInterface` et retournez `true` dans `isPropagationStopped()` pour arrêter l’enchaînement des listeners.
+
+6) Exceptions: sous PSR-14, les exceptions d’un listener ne sont pas avalées. Si votre code dépendait de l’ancienne résilience, entourez l’appel `dispatch()` d’un `try/catch` ou adaptez vos listeners.
+
+## Event immutability
+
+Events in this library are treated as immutable messages. Listeners MUST NOT modify the event instance they receive. If you need to propagate additional information, dispatch a new event.
+
+# To contribute to phariscope/Event
 
 ## Requirements
 

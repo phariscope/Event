@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phariscope\Event\Tests\SomeListeners;
 
 use Phariscope\Event\EventDispatcher;
@@ -13,14 +15,14 @@ class CallAnotherEventListener implements ListenerInterface
     /**
      * @return bool handled event. true si l'evenement a été traité.
      */
-    public function handle(Event $aDomainEvent): bool
+    public function handle(Event $event): bool
     {
         EventDispatcher::instance()->dispatch(new EventSent2("2"));
         return true;
     }
 
-    public function isSubscribedTo(Event $aDomainEvent): bool
+    public function isSubscribedTo(Event $event): bool
     {
-        return $aDomainEvent instanceof EventSent;
+        return $event instanceof EventSent;
     }
 }
