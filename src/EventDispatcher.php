@@ -36,7 +36,20 @@ class EventDispatcher implements EventDispatcherInterface
     {
         static::$instance = null;
     }
+    /**
+     * @deprecated Use distributeImmediately() instead.
+     */
     public function distributeImmmediatly(): void
+    {
+        // Keep backward compatibility with the misspelled method name
+        $this->distributeImmediately();
+    }
+
+    /**
+     * Enable immediate distribution of dispatched events.
+     * When enabled, calls to dispatch() will trigger an automatic distribute().
+     */
+    public function distributeImmediately(): void
     {
         $this->distributeImmediatly = true;
     }

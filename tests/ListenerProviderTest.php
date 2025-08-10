@@ -14,12 +14,15 @@ class ListenerProviderTest extends TestCase
 {
     public function testGetListenersForEvent(): void
     {
+        // Arrange
         $spy = new SpyListener();
-
         $event = new EventSent("unId");
 
+        // Act
         $listener = new ListenerProvider();
         $listener->addListener(EventSent::class, $spy);
+
+        // Assert
         $listeners =  $listener->getListenersForEvent($event);
         $this->assertEquals($spy, $listeners[0]);
     }
@@ -47,19 +50,21 @@ class ListenerProviderTest extends TestCase
 
     public function testAListenerDispatchAnotherEventOfDifferentType(): void
     {
+        // Arrange
         $listener = new CallAnotherEventListener();
-
         $spy = new SpyListener();
 
+        // Act
         $dispatcher = EventDispatcher::instance();
         $dispatcher->subscribe($spy);
         $dispatcher->subscribe($listener);
 
+        // Act
         $event = new EventSent("unId");
         $dispatcher->dispatch($event);
-
         $dispatcher->distribute();
 
+        // Assert
         $this->assertEquals(2, count($spy->traces));
         /** @var EventSent */
         $e1 = $spy->traces[0];
