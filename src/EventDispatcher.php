@@ -12,10 +12,14 @@ class EventDispatcher implements EventDispatcherInterface
     /** @var array<int,ListenerInterface> $subscribers */
     protected array $subscribers;
 
-    /** @var array<Event> */
-    protected array $eventToDistribute;
+    /** @var \SplQueue<Event> */
+    protected \SplQueue $eventToDistribute;
 
-    protected bool $distributeImmediatly = false;
+    /**
+     * Whether to distribute immediately after dispatch.
+     * Kept public name to avoid BC break in serialized states; internal usages should rely on accessors.
+     */
+    protected bool $distributeImmediately = false;
 
     protected static ?EventDispatcher $instance = null;
 
@@ -24,7 +28,7 @@ class EventDispatcher implements EventDispatcherInterface
     private function __construct()
     {
         $this->subscribers = [];
-        $this->eventToDistribute = [];
+        $this->eventToDistribute = new \SplQueue();
     }
 
     public static function instance(): EventDispatcher
@@ -54,7 +58,7 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function distributeImmediately(): void
     {
-        $this->distributeImmediatly = true;
+        $this->distributeImmediately = true;
     }
 
     public function setLogger(?LoggerInterface $logger): void
@@ -91,13 +95,13 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @return Event return the event that was passed. In our implementation, event MUST NOT be modified by listener.
+     * @return Event Return the event that was passed. Listeners MUST NOT modify the event.
      */
 
     public function dispatch(Event $event): Event
     {
-        array_push($this->eventToDistribute, $event);
-        if ($this->distributeImmediatly) {
+        $this->eventToDistribute->enqueue($event);
+        if ($this->distributeImmediately) {
             $this->distribute();
         }
 
@@ -106,10 +110,8 @@ class EventDispatcher implements EventDispatcherInterface
 
     public function distribute(): void
     {
-        if (count($this->eventToDistribute) == 0) {
-            return;
-        }
-        while ($event = array_shift($this->eventToDistribute)) {
+        while (!$this->eventToDistribute->isEmpty()) {
+            $event = $this->eventToDistribute->dequeue();
             $this->distributeEventToSubscribers($event);
         }
     }

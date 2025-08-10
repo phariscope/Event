@@ -37,11 +37,13 @@ final class LoggerTest extends TestCase
         });
 
         // Act
-        $dispatcher->dispatch(new class extends Event {});
+        $dispatcher->dispatch(new class extends Event {
+        });
 
         // Assert
         $this->assertGreaterThanOrEqual(1, $logger->countLevel('error'));
         $record = $logger->lastRecord();
+        $this->assertNotNull($record);
         $this->assertEquals('error', $record['level']);
         $this->assertArrayHasKey('exception', $record['context']);
         $this->assertArrayHasKey('listener', $record['context']);
@@ -71,11 +73,10 @@ final class LoggerTest extends TestCase
         $dispatcher->subscribe($spy);
 
         // Act: should not throw
-        $dispatcher->dispatch(new class extends Event {});
+        $dispatcher->dispatch(new class extends Event {
+        });
 
         // Assert: spy still handled the event
         $this->assertEquals(1, $spy->handleCallCount);
     }
 }
-
-

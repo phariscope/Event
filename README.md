@@ -82,7 +82,7 @@ $dispatcher->distribute();
 
 ## Immediate distribution
 
-By default, events dispatched via `EventDispatcher::dispatch()` are queued and processed when you call `EventDispatcher::distribute()`.
+By default, events dispatched via `EventDispatcher::dispatch()` are queued (FIFO) and processed when you call `EventDispatcher::distribute()`.
 
 If you want events to be processed immediately upon dispatch, enable immediate distribution:
 
@@ -106,6 +106,10 @@ $dispatcher->setLogger(new NullLogger());
 ```
 
 Deprecated: the misspelled method `distributeImmmediatly()` is still available for backward compatibility but will be removed in a future release. Use `distributeImmediately()` instead.
+
+## Event immutability
+
+Events in this library are treated as immutable messages. Listeners MUST NOT modify the event instance they receive. If you need to propagate additional information, dispatch a new event.
 
 # To contribute to phariscope/Event
 
