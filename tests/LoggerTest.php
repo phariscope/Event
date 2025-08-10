@@ -26,11 +26,11 @@ final class LoggerTest extends TestCase
         $dispatcher->distributeImmediately();
 
         $dispatcher->subscribe(new class implements ListenerInterface {
-            public function handle(Event $aDomainEvent): bool
+            public function handle(Event $event): bool
             {
                 throw new \RuntimeException('boom');
             }
-            public function isSubscribedTo(Event $aDomainEvent): bool
+            public function isSubscribedTo(Event $event): bool
             {
                 return true;
             }
@@ -57,11 +57,11 @@ final class LoggerTest extends TestCase
         $dispatcher->distributeImmediately();
 
         $bad = new class implements ListenerInterface {
-            public function handle(Event $aDomainEvent): bool
+            public function handle(Event $event): bool
             {
                 throw new \RuntimeException('no logger boom');
             }
-            public function isSubscribedTo(Event $aDomainEvent): bool
+            public function isSubscribedTo(Event $event): bool
             {
                 return true;
             }

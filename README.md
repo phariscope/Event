@@ -91,6 +91,14 @@ use Phariscope\Event\EventDispatcher;
 
 $dispatcher = EventDispatcher::instance();
 $dispatcher->distributeImmediately(); // enables automatic distribute() after each dispatch
+ 
+// You can disable it later if needed
+$dispatcher->disableImmediateDistribution();
+
+// And you can check the current mode
+if ($dispatcher->isImmediateDistributionEnabled()) {
+    // ...
+}
 ```
 
 ## Optional logging
@@ -106,6 +114,73 @@ $dispatcher->setLogger(new NullLogger());
 ```
 
 Deprecated: the misspelled method `distributeImmmediatly()` is still available for backward compatibility but will be removed in a future release. Use `distributeImmediately()` instead.
+
+### Resetting subscribers (useful in tests)
+
+When using the singleton in tests or long‑running processes, you may need to reset the subscriptions between scenarios:
+
+```php
+use Phariscope\Event\EventDispatcher;
+
+$dispatcher = EventDispatcher::instance();
+
+// Remove all currently subscribed listeners
+$dispatcher->clearSubscribers();
+
+// If you also need a fresh instance (clears queue and state)
+EventDispatcher::tearDown();
+$dispatcher = EventDispatcher::instance();
+```
+
+## PSR-14 compliance (internal integration)
+
+This package integrates PSR-14 semantics internally while preserving the legacy API:
+- You can still use `EventDispatcher` (singleton, queue, `distribute()` / `distributeImmediately()`).
+- Listeners remain `Phariscope\Event\Psr14\ListenerInterface`.
+- `StoppableEventInterface` is honored: if your event implements it and returns `true` in `isPropagationStopped()`, the dispatcher stops invoking further listeners after the current one.
+- Exceptions thrown by listeners are swallowed by the legacy dispatcher (as before). Use the optional PSR-3 logger to observe them.
+
+## Complete DDD/TDD Examples
+
+For comprehensive examples showing how to use this library in a Domain-Driven Design context with Test-Driven Development, see [DDD-TDD-EXAMPLES.md](DDD-TDD-EXAMPLES.md). This documentation covers:
+
+- **Domain Layer**: Aggregates, domain events, and event testing
+- **Application Layer**: Services with event distribution and testing  
+- **Infrastructure Layer**: Controllers, email listeners, and integration tests
+- **Complete workflow**: From HTTP request to domain event to email notification
+- **Key practices**: Event dispatching, testing with SpyListener, and distribution modes
+
+## Migration guide: Legacy API → PSR-14 (concepts)
+
+### Mapping
+
+- Legacy dispatcher: `Phariscope\Event\EventDispatcher` (queued) → PSR concept: synchronous, immediate dispatch
+- Legacy listener: `Phariscope\Event\Psr14\ListenerInterface` → PSR concept: `callable(object): void`
+- Legacy provider: `Phariscope\Event\ListenerProvider` (custom type) → PSR concept: provider returns callables for a given event object
+- Legacy event type: `Phariscope\Event\Psr14\Event` → PSR concept: any `object` (optionally implement `StoppableEventInterface`)
+- Immediate distribution: `distributeImmediately()` → PSR concept: always immediate by design
+
+### Steps
+
+1) Install PSR-14 interfaces (already a dependency of this package): `psr/event-dispatcher`.
+
+2) Instantiate the legacy dispatcher as usual (PSR semantics are handled internally at distribution time).
+
+3) Enregistrer vos listeners legacy via `EventDispatcher::subscribe()` comme auparavant.
+
+4) Remplacer les appels de distribution:
+```php
+// Avant (legacy)
+Phariscope\Event\EventDispatcher::instance()->dispatch($event);
+Phariscope\Event\EventDispatcher::instance()->distribute();
+
+// Après (sémantique PSR intégrée)
+$dispatcher->dispatch($event); // synchronously handled when immediate distribution is enabled
+```
+
+5) Propagation stoppable (facultatif): implémentez `Psr\EventDispatcher\StoppableEventInterface` et retournez `true` dans `isPropagationStopped()` pour arrêter l’enchaînement des listeners.
+
+6) Exceptions: sous PSR-14, les exceptions d’un listener ne sont pas avalées. Si votre code dépendait de l’ancienne résilience, entourez l’appel `dispatch()` d’un `try/catch` ou adaptez vos listeners.
 
 ## Event immutability
 

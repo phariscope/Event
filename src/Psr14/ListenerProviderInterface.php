@@ -14,7 +14,7 @@ interface ListenerProviderInterface
     /**
      * @param Event $event
      *   An event for which to return the relevant listeners.
-     * @return array<ListenerInterface>
+     * @return array<int,ListenerInterface>
      *   An iterable (array, iterator, or generator) of callables.  Each
      *   callable MUST be type-compatible with $event.
      */

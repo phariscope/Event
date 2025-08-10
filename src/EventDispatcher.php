@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phariscope\Event;
 
 use Phariscope\Event\Psr14\Event;
 use Phariscope\Event\Psr14\EventDispatcherInterface;
 use Phariscope\Event\Psr14\ListenerInterface;
 use Psr\Log\LoggerInterface;
+use Psr\EventDispatcher\StoppableEventInterface;
 
 class EventDispatcher implements EventDispatcherInterface
 {
@@ -61,6 +64,22 @@ class EventDispatcher implements EventDispatcherInterface
         $this->distributeImmediately = true;
     }
 
+    /**
+     * Disable immediate distribution mode.
+     */
+    public function disableImmediateDistribution(): void
+    {
+        $this->distributeImmediately = false;
+    }
+
+    /**
+     * Check whether immediate distribution is enabled.
+     */
+    public function isImmediateDistributionEnabled(): bool
+    {
+        return $this->distributeImmediately;
+    }
+
     public function setLogger(?LoggerInterface $logger): void
     {
         $this->logger = $logger;
@@ -87,7 +106,6 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * @deprecated Use dispatch() instead.
      * @param Event $anEvent
-     * @return void
      */
     public function publish(Event $anEvent): void
     {
@@ -119,14 +137,12 @@ class EventDispatcher implements EventDispatcherInterface
     private function distributeEventToSubscribers(Event $event): void
     {
         foreach ($this->subscribers as $aSubscriber) {
-            $this->tryToHandleEventIfSubscribed($aSubscriber, $event);
-        }
-    }
-
-    private function tryToHandleEventIfSubscribed(ListenerInterface $subscriber, Event $event): void
-    {
-        if ($subscriber->isSubscribedTo($event)) {
-            $this->tryToHandleEvent($subscriber, $event);
+            if ($aSubscriber->isSubscribedTo($event)) {
+                $this->tryToHandleEvent($aSubscriber, $event);
+                if ($event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
+                    break;
+                }
+            }
         }
     }
 
@@ -155,5 +171,47 @@ class EventDispatcher implements EventDispatcherInterface
                 unset($this->subscribers[$id]);
             }
         }
+    }
+
+    /**
+     * Remove all currently subscribed listeners.
+     */
+    public function clearSubscribers(): void
+    {
+        $this->subscribers = [];
+    }
+
+    /**
+     * Get the number of currently queued events.
+     */
+    public function getQueuedEventCount(): int
+    {
+        return $this->eventToDistribute->count();
+    }
+
+    /**
+     * Check if there are any events queued for distribution.
+     */
+    public function hasQueuedEvents(): bool
+    {
+        return !$this->eventToDistribute->isEmpty();
+    }
+
+    /**
+     * Get all currently subscribed listeners.
+     *
+     * @return array<int,ListenerInterface>
+     */
+    public function getSubscribers(): array
+    {
+        return $this->subscribers;
+    }
+
+    /**
+     * Get the number of subscribed listeners.
+     */
+    public function getSubscriberCount(): int
+    {
+        return count($this->subscribers);
     }
 }

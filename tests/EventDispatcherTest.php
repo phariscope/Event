@@ -22,4 +22,41 @@ class EventDispatcherTest extends TestCase
         // Assert
         $this->assertEquals(0, $spy->handleCallCount);
     }
+
+    public function testIsDistributeImmediately(): void
+    {
+        // Arrange
+        $dispatcher = EventDispatcher::instance();
+
+        // Act
+        $dispatcher->distributeImmediately();
+
+        // Assert
+        $this->assertTrue($dispatcher->isImmediateDistributionEnabled());
+    }
+
+    public function testDisableImmediateDistribution(): void
+    {
+        // Arrange
+        $dispatcher = EventDispatcher::instance();
+
+        // Act
+        $dispatcher->disableImmediateDistribution();
+
+        // Assert
+        $this->assertFalse($dispatcher->isImmediateDistributionEnabled());
+    }
+
+    public function testClearSubscribers(): void
+    {
+        // Arrange
+        $dispatcher = EventDispatcher::instance();
+        $dispatcher->subscribe(new SpyListener());
+
+        // Act
+        $dispatcher->clearSubscribers();
+
+        // Assert
+        $this->assertEmpty($dispatcher->getSubscribers());
+    }
 }
