@@ -93,6 +93,18 @@ $dispatcher = EventDispatcher::instance();
 $dispatcher->distributeImmediately(); // enables automatic distribute() after each dispatch
 ```
 
+## Optional logging
+
+You can plug a PSR-3 logger to observe listener exceptions without breaking the dispatch flow:
+
+```php
+use Phariscope\Event\EventDispatcher;
+use Psr\Log\NullLogger; // or Monolog\Logger
+
+$dispatcher = EventDispatcher::instance();
+$dispatcher->setLogger(new NullLogger());
+```
+
 Deprecated: the misspelled method `distributeImmmediatly()` is still available for backward compatibility but will be removed in a future release. Use `distributeImmediately()` instead.
 
 # To contribute to phariscope/Event

@@ -5,6 +5,7 @@ namespace Phariscope\Event;
 use Phariscope\Event\Psr14\Event;
 use Phariscope\Event\Psr14\EventDispatcherInterface;
 use Phariscope\Event\Psr14\ListenerInterface;
+use Psr\Log\LoggerInterface;
 
 class EventDispatcher implements EventDispatcherInterface
 {
@@ -17,6 +18,8 @@ class EventDispatcher implements EventDispatcherInterface
     protected bool $distributeImmediatly = false;
 
     protected static ?EventDispatcher $instance = null;
+
+    protected ?LoggerInterface $logger = null;
 
     private function __construct()
     {
@@ -52,6 +55,11 @@ class EventDispatcher implements EventDispatcherInterface
     public function distributeImmediately(): void
     {
         $this->distributeImmediatly = true;
+    }
+
+    public function setLogger(?LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 
     public function __clone()
@@ -124,7 +132,17 @@ class EventDispatcher implements EventDispatcherInterface
     {
         try {
             $subscriber->handle($event);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            if (null !== $this->logger) {
+                $this->logger->error(
+                    'Event listener threw an exception',
+                    [
+                        'exception' => $e,
+                        'listener' => get_class($subscriber),
+                        'event' => get_class($event),
+                    ]
+                );
+            }
         }
     }
 
