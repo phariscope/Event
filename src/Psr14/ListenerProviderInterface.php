@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phariscope\Event\Psr14;
 
 use Phariscope\Event\Psr14\Event;
