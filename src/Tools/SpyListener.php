@@ -12,12 +12,12 @@ use Phariscope\Event\Psr14\ListenerInterface;
  */
 class SpyListener implements ListenerInterface
 {
-    public Event $domainEvent;
+    public ?Event $domainEvent = null;
 
     public int $handleCallCount = 0;
 
     /** @var array<int,Event> */
-    public array $traces;
+    public array $traces = [];
 
     public function handle(Event $event): bool
     {

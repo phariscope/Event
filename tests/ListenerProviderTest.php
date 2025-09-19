@@ -14,6 +14,18 @@ use PHPUnit\Framework\TestCase;
 
 class ListenerProviderTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        EventDispatcher::tearDown();
+    }
+
+    protected function tearDown(): void
+    {
+        EventDispatcher::tearDown();
+        parent::tearDown();
+    }
+
     public function testGetListenersForEvent(): void
     {
         // Arrange

@@ -4,7 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
-## [0.2.0] - 2025-08-10
+## [1.2.1] - 2025-09-19
+
+### Fixed
+- hasSubscriber accepts both class and object
+- Minor improvements and code quality enhancements
+- Documentation refinements
+
+## [1.2.0] - 2025-08-10
 
 ### Added
 - `EventDispatcher::distributeImmediately()` to enable automatic distribution on each `dispatch()`.
@@ -37,9 +44,63 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 ### Notes
 - PSR-3 logging is optional. If you want to plug a logger, ensure `psr/log` is available in your project.
 - Serializing `EventDispatcher` instances is not supported; the class is a singleton and intended for in-process use.
- - PSR-14 classes are not exposed publicly; integration is internal to preserve the legacy API surface.
+- PSR-14 classes are not exposed publicly; integration is internal to preserve the legacy API surface.
 
-## [0.1.0] - Initial
-- Initial public release.
+## [1.1.0] - 2024-02-29
 
-[0.2.0]: https://github.com/phariscope/Event/compare/0.1.0...0.2.0
+### Fixed
+- Fixed listener loop event handling - ability to call another event inside a listener
+
+## [1.0.7] - 2024-02-29
+
+### Fixed
+- Fixed listener loop event handling - ability to call another event inside a listener
+
+## [1.0.6] - 2023-10-05
+
+### Changed
+- Refactored: moved functions for better organization
+
+## [1.0.5] - 2023-10-01
+
+### Changed
+- Made `occurredOn` property protected in Event class
+
+## [1.0.4] - 2023-09-30
+
+### Fixed
+- Fixed composer configuration
+
+## [1.0.3] - 2023-09-27
+
+### Added
+- Added default datetime handling
+
+## [1.0.2] - 2023-09-24
+
+### Changed
+- Use EventAbstract instead of EventInterface
+
+## [1.0.1] - 2023-09-24
+
+### Changed
+- Use EventAbstract instead of EventInterface
+
+## [1.0.0] - 2023-09-24
+
+### Added
+- Initial stable release
+- Event creation, publish and distribute functionality
+- Core event dispatcher implementation
+
+[1.2.1]: https://github.com/phariscope/Event/compare/1.2.0...1.2.1
+[1.2.0]: https://github.com/phariscope/Event/compare/1.1.0...1.2.0
+[1.1.0]: https://github.com/phariscope/Event/compare/1.0.7...1.1.0
+[1.0.7]: https://github.com/phariscope/Event/compare/1.0.6...1.0.7
+[1.0.6]: https://github.com/phariscope/Event/compare/1.0.5...1.0.6
+[1.0.5]: https://github.com/phariscope/Event/compare/1.0.4...1.0.5
+[1.0.4]: https://github.com/phariscope/Event/compare/1.0.3...1.0.4
+[1.0.3]: https://github.com/phariscope/Event/compare/1.0.2...1.0.3
+[1.0.2]: https://github.com/phariscope/Event/compare/1.0.1...1.0.2
+[1.0.1]: https://github.com/phariscope/Event/compare/1.0.0...1.0.1
+[1.0.0]: https://github.com/phariscope/Event/releases/tag/1.0.0
