@@ -51,7 +51,7 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function distributeImmmediatly(): void
     {
-        // Keep backward compatibility with the misspelled method name
+        @trigger_error('Use distributeImmediately() instead', E_USER_DEPRECATED);
         $this->distributeImmediately();
     }
 
@@ -98,8 +98,18 @@ class EventDispatcher implements EventDispatcherInterface
         }
     }
 
-    public function hasSubscriber(ListenerInterface $subscriber): bool
+    /**
+     * @param ListenerInterface|string $subscriber The subscriber to check. If a string is provided,
+     *  it will be checked against the class name.
+     */
+    public function hasSubscriber(ListenerInterface|string $subscriber): bool
     {
+        if (is_string($subscriber)) {
+            $subscribers = array_filter($this->subscribers, function (ListenerInterface $s) use ($subscriber) {
+                return $s instanceof $subscriber;
+            });
+            return count($subscribers) >= 1;
+        }
         return false !== array_search($subscriber, $this->subscribers, true);
     }
 

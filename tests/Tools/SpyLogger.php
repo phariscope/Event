@@ -13,55 +13,59 @@ class SpyLogger implements LoggerInterface
      */
     public array $records = [];
 
-    public function emergency($message, array $context = []): void
+    public function emergency(mixed $message, array $context = []): void
     {
         $this->log('emergency', $message, $context);
     }
-    public function alert($message, array $context = []): void
+    public function alert(mixed $message, array $context = []): void
     {
         $this->log('alert', $message, $context);
     }
-    public function critical($message, array $context = []): void
+    public function critical(mixed $message, array $context = []): void
     {
         $this->log('critical', $message, $context);
     }
-    public function error($message, array $context = []): void
+    public function error(mixed $message, array $context = []): void
     {
         $this->log('error', $message, $context);
     }
-    public function warning($message, array $context = []): void
+    public function warning(mixed $message, array $context = []): void
     {
         $this->log('warning', $message, $context);
     }
-    public function notice($message, array $context = []): void
+    public function notice(mixed $message, array $context = []): void
     {
         $this->log('notice', $message, $context);
     }
-    public function info($message, array $context = []): void
+    public function info(mixed $message, array $context = []): void
     {
         $this->log('info', $message, $context);
     }
-    public function debug($message, array $context = []): void
+    public function debug(mixed $message, array $context = []): void
     {
         $this->log('debug', $message, $context);
     }
 
     /**
-     * @param mixed $level
      * @param array<mixed> $context
      */
-    public function log($level, $message, array $context = []): void
+    public function log(mixed $level, mixed $message, array $context = []): void
     {
-        $levelString = is_string($level)
-            ? $level
-            : ((is_object($level) && method_exists($level, '__toString'))
-                ? (string) $level
-                : (string) json_encode($level)
-            );
+        $levelString = match (true) {
+            is_string($level) => $level,
+            is_object($level) && method_exists($level, '__toString') => (string) $level,
+            default => json_encode($level) ?: 'unknown'
+        };
+
+        $messageString = match (true) {
+            is_string($message) => $message,
+            is_object($message) && method_exists($message, '__toString') => (string) $message,
+            default => json_encode($message) ?: 'unknown'
+        };
 
         $this->records[] = [
             'level' => $levelString,
-            'message' => (string) $message,
+            'message' => $messageString,
             'context' => $context,
         ];
     }

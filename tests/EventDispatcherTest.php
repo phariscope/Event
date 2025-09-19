@@ -10,41 +10,79 @@ use PHPUnit\Framework\TestCase;
 
 class EventDispatcherTest extends TestCase
 {
-    public function testDispatch(): void
+    protected function setUp(): void
+    {
+        parent::setUp();
+        EventDispatcher::tearDown();
+    }
+
+    protected function tearDown(): void
+    {
+        EventDispatcher::tearDown();
+        parent::tearDown();
+    }
+
+    public function testDispatch0Event(): void
     {
         // Arrange
         $spy = new SpyListener();
-        $dispatcher = EventDispatcher::instance();
+        $sut = EventDispatcher::instance();
+        $sut->subscribe($spy);
 
         // Act
-        $dispatcher->distribute();
+        $sut->distribute();
 
         // Assert
         $this->assertEquals(0, $spy->handleCallCount);
     }
 
+    public function testDispatch1Event(): void
+    {
+        // Arrange
+        $spy = new SpyListener();
+        $sut = EventDispatcher::instance();
+        $sut->subscribe($spy);
+
+        // Act
+        $sut->dispatch(new EventSent("unId"));
+        $sut->distribute();
+
+        // Assert
+        $this->assertEquals(1, $spy->handleCallCount);
+        $this->assertInstanceOf(EventSent::class, $spy->domainEvent);
+        $this->assertEquals("unId", $spy->domainEvent->id());
+    }
+
     public function testIsDistributeImmediately(): void
     {
         // Arrange
-        $dispatcher = EventDispatcher::instance();
+        $spy = new SpyListener();
+        $sut = EventDispatcher::instance();
+        $sut->subscribe($spy);
+        $sut->distributeImmediately();
 
         // Act
-        $dispatcher->distributeImmediately();
+        $sut->dispatch(new EventSent("unId"));
 
         // Assert
-        $this->assertTrue($dispatcher->isImmediateDistributionEnabled());
+        $this->assertTrue($sut->isImmediateDistributionEnabled());
+        $this->assertEquals(1, $spy->handleCallCount);
     }
 
     public function testDisableImmediateDistribution(): void
     {
         // Arrange
-        $dispatcher = EventDispatcher::instance();
+        $spy = new SpyListener();
+        $sut = EventDispatcher::instance();
+        $sut->subscribe($spy);
 
         // Act
-        $dispatcher->disableImmediateDistribution();
+        $sut->disableImmediateDistribution();
+        $sut->dispatch(new EventSent("unId"));
 
         // Assert
-        $this->assertFalse($dispatcher->isImmediateDistributionEnabled());
+        $this->assertFalse($sut->isImmediateDistributionEnabled());
+        $this->assertEquals(0, $spy->handleCallCount);
     }
 
     public function testClearSubscribers(): void
@@ -58,5 +96,20 @@ class EventDispatcherTest extends TestCase
 
         // Assert
         $this->assertEmpty($dispatcher->getSubscribers());
+    }
+
+    public function testHasSubscriber(): void
+    {
+        // Arrange
+        $sut = EventDispatcher::instance();
+        $listener = new SpyListener();
+
+        // Act
+        $sut->subscribe($listener);
+
+        // Assert
+        $this->assertTrue($sut->hasSubscriber($listener));
+        $this->assertTrue($sut->hasSubscriber(SpyListener::class));
+        $this->assertFalse($sut->hasSubscriber('ListenerInexistant'));
     }
 }
